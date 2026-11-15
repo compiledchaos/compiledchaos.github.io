@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Portal | Organic Waste to Wealth</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body data-page="farmer">
+  <header class="topbar">
+    <a class="brand" href="customer.html"><span class="brand-mark">OW</span><span>Organic Waste <b>to Wealth</b></span></a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="customer.html">Customer</a><a href="admin.html">Admin</a><a class="active" href="farmer.html">Farmer</a>
+    </nav>
+    <span class="topbar-note">Farm input marketplace</span>
+  </header>
+  <main class="container">
+    <section class="hero farmer-hero">
+      <div><p class="eyebrow">FARMER PORTAL</p><h1>Better inputs.<br><span>Healthier growing.</span></h1><p class="hero-copy">Explore products made from recovered organic resources and support a more circular agricultural system.</p></div>
+      <div class="hero-art" aria-hidden="true"><div class="art-circle">✿</div><div class="art-leaf leaf-one">✦</div><div class="art-leaf leaf-two">♧</div><div class="art-caption">From waste<br>to resources.</div></div>
+    </section>
+    <section class="section-heading marketplace-heading"><div><p class="eyebrow">OUR CATALOGUE</p><h2>Agricultural products</h2><p class="muted">Illustrative product listings for the project demonstration.</p></div><div class="cart-counter">Cart <b id="cart-count">0</b></div></section>
+    <section id="product-grid" class="product-grid">
+      <article class="product-card"><div class="product-art compost-art">✿</div><div class="product-body"><span class="product-tag">SOIL HEALTH</span><h3>Organic compost</h3><p>Compost produced from suitable segregated organic matter. Product quality would be tested before sale.</p><div class="product-bottom"><strong>₹12 <small>/ kg</small></strong><button class="button button-primary add-to-cart" data-product="compost">Add to cart</button></div></div></article>
+      <article class="product-card"><div class="product-art pesticide-art">❋</div><div class="product-body"><span class="product-tag">CROP PROTECTION · R&amp;D</span><h3>Allium-based botanical pesticide</h3><p>Research-stage concept using onion and garlic waste. Not offered for actual agricultural use or sale.</p><div class="product-bottom"><strong>₹150 <small>/ L (demo)</small></strong><button class="button button-primary add-to-cart" data-product="pesticide">Add to cart</button></div></div></article>
+      <article class="product-card"><div class="product-art biogas-art">♨</div><div class="product-body"><span class="product-tag">RENEWABLE ENERGY</span><h3>Biogas</h3><p>Concept for energy recovered from suitable organic waste through anaerobic digestion.</p><div class="product-bottom"><strong>₹25 <small>/ m³ (demo)</small></strong><button class="button button-primary add-to-cart" data-product="biogas">Add to cart</button></div></div></article>
+    </section>
+    <section class="content-grid farmer-lower">
+      <div class="panel">
+        <p class="eyebrow">DEMO CHECKOUT</p><h2>Your cart</h2>
+        <div id="cart-items" class="cart-items"><p class="muted">Your cart is empty. Add a product to begin.</p></div>
+        <div class="cart-total"><span>Demo total</span><strong id="cart-total">₹0</strong></div>
+        <button id="place-order" class="button button-primary button-wide" type="button" disabled>Place demonstration order</button>
+        <div id="order-message" class="form-message" role="status"></div>
+      </div>
+      <div class="info-card"><span class="info-symbol">i</span><div><b>About these listings</b><p>Prices and availability are fictional demonstration values. The pesticide is a research concept only; commercial sale or use would require testing, registration and regulatory approval. No real orders or payments are processed.</p></div></div>
+    </section>
+    <footer class="footer"><span>© 2026 Organic Waste to Wealth</span><span>Farmer marketplace · Prototype</span></footer>
+  </main>
+</body>
+</html>

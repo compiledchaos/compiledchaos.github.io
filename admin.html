@@ -3,18 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bio-Waste Grading (Admin)</title>
-  <link href="admin_styles.css" rel="stylesheet">
-  <script src="admin_core.js"></script>
+  <title>Admin Portal | Organic Waste to Wealth</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
 </head>
-<body>
-
-  <nav>
-    <h2>🛠️ Admin Grading Portal</h2>
-    <a href="index.html">← Back to Customer View</a>
-  </nav>
-
-  <button class="btn-clear" onclick="clearDatabase()">Clear All Demo Data</button>
-  <div id="adminList"></div>
+<body data-page="admin">
+  <header class="topbar">
+    <a class="brand" href="customer.html"><span class="brand-mark">OW</span><span>Organic Waste <b>to Wealth</b></span></a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="customer.html">Customer</a><a class="active" href="admin.html">Admin</a><a href="farmer.html">Farmer</a>
+    </nav>
+    <span class="topbar-note">Operations dashboard</span>
+  </header>
+  <main class="container">
+    <section class="page-heading">
+      <div><p class="eyebrow">OPERATIONS</p><h1>Admin dashboard</h1><p class="muted">Review incoming waste submissions, verify details and manage collection status.</p></div>
+      <span class="pill pill-green">Demo administrator</span>
+    </section>
+    <section class="metric-grid">
+      <div class="metric-card"><span>Total submissions</span><strong id="metric-total">0</strong><small>All submitted tickets</small></div>
+      <div class="metric-card"><span>Awaiting review</span><strong id="metric-pending">0</strong><small>New submissions</small></div>
+      <div class="metric-card"><span>Accepted quantity</span><strong id="metric-weight">0 kg</strong><small>Admin-confirmed weight</small></div>
+      <div class="metric-card"><span>Estimated payouts</span><strong id="metric-payout">₹0</strong><small>For accepted tickets</small></div>
+    </section>
+    <section class="panel admin-panel">
+      <div class="section-heading responsive-heading">
+        <div><p class="eyebrow">SUBMISSION MANAGEMENT</p><h2>Waste tickets</h2></div>
+        <div class="table-actions"><input id="admin-search" type="search" placeholder="Search ticket, name or phone"><button id="refresh-tickets" class="button button-outline" type="button">↻ Refresh</button></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ticket / Customer</th><th>Waste details</th><th>Method</th><th>Estimate</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="admin-ticket-list"><tr><td colspan="6" class="empty-state">No submissions yet. Create one from the Customer page.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="fine-print">This is a demonstration admin panel. Records are stored in this browser's local storage and are not shared across devices.</p>
+    </section>
+    <section class="panel detail-panel">
+      <div class="section-heading"><div><p class="eyebrow">TICKET REVIEW</p><h2>Inspect selected ticket</h2></div><span class="pill">Admin review</span></div>
+      <div id="admin-ticket-detail" class="empty-state">Select a ticket from the table to review its details.</div>
+    </section>
+    <footer class="footer"><span>© 2026 Organic Waste to Wealth</span><span>Admin · Prototype</span></footer>
+  </main>
 </body>
 </html>
