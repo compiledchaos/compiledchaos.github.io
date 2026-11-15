@@ -1,0 +1,23 @@
+body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; background: #f4f7f5; color: #222; }
+
+nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #d0e0d5; padding-bottom: 10px; }
+
+nav a { text-decoration: none; color: #1b6b3a; font-weight: bold; }
+
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); margin-bottom: 20px; }
+
+input, button { width: 100%; padding: 10px; margin-top: 10px; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
+
+button { background: #1b6b3a; color: white; border: none; font-weight: bold; cursor: pointer; }
+
+button:hover { background: #14522c; }
+
+.item { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; gap: 15px; align-items: center; }
+
+.item img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; }
+
+.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+
+.pending { background: #fff3cd; color: #856404; }
+
+.graded { background: #d4edda; color: #155724; }

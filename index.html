@@ -4,20 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bio-Waste Drop-Off (Customer)</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; background: #f4f7f5; color: #222; }
-    nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #d0e0d5; padding-bottom: 10px; }
-    nav a { text-decoration: none; color: #1b6b3a; font-weight: bold; }
-    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    input, button { width: 100%; padding: 10px; margin-top: 10px; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
-    button { background: #1b6b3a; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button:hover { background: #14522c; }
-    .item { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; gap: 15px; align-items: center; }
-    .item img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; }
-    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
-    .pending { background: #fff3cd; color: #856404; }
-    .graded { background: #d4edda; color: #155724; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="core.js"></script>
 </head>
 <body>
 
@@ -38,83 +26,5 @@
     <h3>Your Submissions & Grades</h3>
     <div id="submissionsList"></div>
   </div>
-
-  <script>
-    function submitWaste() {
-      const name = document.getElementById('customerName').value.trim();
-      const note = document.getElementById('wasteNote').value.trim();
-      const fileInput = document.getElementById('wastePhoto');
-
-      if (!name || !note || !fileInput.files[0]) {
-        alert("Please fill in all fields and select a photo.");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-          // Compress image to save localStorage space
-          const canvas = document.createElement('canvas');
-          const maxWidth = 400;
-          const scale = maxWidth / img.width;
-          canvas.width = maxWidth;
-          canvas.height = img.height * scale;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-          // Save to localStorage
-          const records = JSON.parse(localStorage.getItem('bioWasteDB')) || [];
-          records.unshift({
-            id: Date.now(),
-            name: name,
-            note: note,
-            image: compressedDataUrl,
-            grade: null,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          });
-
-          localStorage.setItem('bioWasteDB', JSON.stringify(records));
-          
-          // Reset form and refresh list
-          document.getElementById('customerName').value = '';
-          document.getElementById('wasteNote').value = '';
-          fileInput.value = '';
-          renderSubmissions();
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-    }
-
-    function renderSubmissions() {
-      const records = JSON.parse(localStorage.getItem('bioWasteDB')) || [];
-      const list = document.getElementById('submissionsList');
-      
-      if (records.length === 0) {
-        list.innerHTML = "<p>No drop-offs submitted yet.</p>";
-        return;
-      }
-
-      list.innerHTML = records.map(item => `
-        <div class="item">
-          <img src="${item.image}" alt="Bio waste">
-          <div>
-            <strong>${item.name}</strong> (${item.timestamp})<br>
-            <span>${item.note}</span><br><br>
-            ${item.grade 
-              ? `<span class="badge graded">Grade: ${item.grade}</span>` 
-              : `<span class="badge pending">Pending Admin Review</span>`
-            }
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Refresh automatically if admin updates grade in another tab
-    window.addEventListener('storage', renderSubmissions);
-    renderSubmissions();
-  </script>
 </body>
 </html>
