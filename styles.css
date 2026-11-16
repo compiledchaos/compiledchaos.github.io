@@ -63,6 +63,7 @@ input::placeholder, textarea::placeholder { color: #a2ada5; }
 .upload-button input { display: none; }.photo-preview { width: 100%; max-height: 190px; object-fit: cover; border-radius: 9px; }
 .hidden { display: none !important; }
 .pickup-fieldset { border: 0; padding: 0; margin: 0; }.pickup-fieldset legend { font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+#address-label {display: none;}
 .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .choice-card { display: flex; align-items: center; gap: 9px; border: 1px solid var(--line); border-radius: 10px; padding: 11px; cursor: pointer; margin: 0 !important; }
 .choice-card:has(input:checked) { border-color: #7caf89; background: #f4faf5; }.choice-card input { accent-color: var(--green); }

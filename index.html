@@ -76,10 +76,10 @@
           <fieldset class="pickup-fieldset">
             <legend>How should we receive your waste?</legend>
             <div class="choice-grid">
-              <label class="choice-card"><input type="radio" name="method" value="Drop-off" checked><span class="choice-icon">⌂</span><span><b>I'll drop it off</b><small>Bring it to a collection point</small></span></label>
-              <label class="choice-card"><input type="radio" name="method" value="Pickup"><span class="choice-icon">↗</span><span><b>Pick it up</b><small>We collect it from you</small></span></label>
+              <label class="choice-card"><input id="drop_off" type="radio" name="method" value="Drop-off" checked><span class="choice-icon">⌂</span><span><b>I'll drop it off</b><small>Bring it to a collection point</small></span></label>
+              <label class="choice-card"><input id="pickup" type="radio" name="method" value="Pickup"><span class="choice-icon">↗</span><span><b>Pick it up</b><small>We collect it from you</small></span></label>
             </div>
-            <label id="location-label">Drop-off / pickup location
+            <label id="location-label">Drop-off
               <select name="location" id="locations-select">
                 <option value="Place1">Place1</option>
                 <option value="Place2">Place2</option>
@@ -87,6 +87,9 @@
                 <option value="Place4">Place4</option>
                 <option value="Place5">Place5</option>
               </select>
+            </label>
+            <label id="address-label">Pickup location
+              <input type="text" placeholder="Enter Pickup Location">
             </label>
           </fieldset>
 

@@ -141,6 +141,20 @@
       renderTicket(ticket);
     });
     updateEstimate();
+
+    const pickup_btn = document.getElementById("pickup");
+
+    pickup_btn.addEventListener("click", function() {
+      document.getElementById('address-label').style.display='block'
+      document.getElementById('location-label').style.display='none'
+    });
+
+    const drop_off_btn = document.getElementById("drop_off");
+
+    drop_off_btn.addEventListener("click", function() {
+      document.getElementById('location-label').style.display='block'
+      document.getElementById('address-label').style.display='none'
+    });
   }
 
   function compressImage(file) {
