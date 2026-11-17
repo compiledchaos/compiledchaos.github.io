@@ -35,6 +35,23 @@
         <div id="order-message" class="form-message" role="status"></div>
       </div>
       <div class="info-card"><span class="info-symbol">i</span><div><b>About these listings</b><p>Prices and availability are fictional demonstration values. The pesticide is a research concept only; commercial sale or use would require testing, registration and regulatory approval. No real orders or payments are processed.</p></div></div>
+
+      <aside class="side-column">
+        <div class="panel lookup-panel">
+          <p class="eyebrow">TICKET LOOKUP</p>
+          <h2>Track a submission</h2>
+          <p class="muted">Already submitted waste? Enter the ticket ID you received to view its details and estimated payment.</p>
+          <form id="lookup-ORD-form" class="lookup-form">
+            <label for="lookup-ORD-id">Your ticket ID</label>
+            <div class="lookup-input-row"><input id="lookup-ORD-id" type="text" placeholder="e.g. OWW-ABC123" required><button class="button button-dark" type="submit">Find</button></div>
+          </form>
+          <div id="ticket-ORD-result" class="ticket-result" aria-live="polite"></div>
+        </div>
+        <div class="info-card">
+          <span class="info-symbol">i</span>
+          <div><b>How payment works</b><p>Your ticket shows an estimate based on the category and quantity you entered. The admin team confirms the accepted weight and final amount after inspection.</p></div>
+        </div>
+      </aside>
     </section>
     <footer class="footer"><span>© 2026 GreenGuardians</span><span>Farmer marketplace · Prototype</span></footer>
   </main>

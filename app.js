@@ -166,8 +166,8 @@
     });
   }
 */
-function calculatePayout(rate, qty, method) {
-  return rate * qty * (method === "Pickup" ? 0.8 : 1);
+function calculatePayout(rate, qty, method, quality = 1) {
+  return rate * qty * (method === "Pickup" ? 0.8 : 1) * quality;
 }
 
 function initCustomer() {
@@ -417,6 +417,8 @@ function initCustomer() {
     function renderAdminDetail(t) {
       const detail = document.getElementById("admin-ticket-detail");
       const actualWeight = t.actualWeight == null ? t.weight : t.actualWeight;
+      const displayAmount = t.finalAmount ?? t.estimatedAmount;
+      const amountLable = t.finalAmount != null ? "Final payout" : "Current estimate";
       detail.innerHTML = `
         <div class="detail-grid">
           <div class="detail-item"><small>Ticket ID</small><b>${escapeHTML(t.id)}</b></div>
@@ -426,11 +428,12 @@ function initCustomer() {
           <div class="detail-item"><small>Estimated quantity</small><b>${escapeHTML(t.weight)} kg</b></div>
           <div class="detail-item"><small>Submission method</small><b>${escapeHTML(t.method)} · ${escapeHTML(t.location)}</b></div>
           <div class="detail-item"><small>Customer details</small><b>${escapeHTML(t.details || "No additional details")}</b></div>
-          <div class="detail-item"><small>Current estimate</small><b>${money(t.estimatedAmount)}</b></div>
+          <div class="detail-item"><small>${amountLable}</small><b>${money(displayAmount)}</b></div>
         </div>
         ${t.photo ? `<p><img src="${t.photo}" alt="Customer waste upload" style="max-width:180px;max-height:130px;object-fit:cover;border-radius:9px;margin-top:12px"></p>` : ""}
         <div class="admin-controls">
           <label>Verified weight (kg)<input id="verified-weight" type="number" min="0" step="0.1" value="${escapeHTML(actualWeight)}"></label>
+          <label>Quality (1-100)<input id="quality_rating" type="number" min="0" step="1" max="100" placeholder="eg. 55"></label>
           <label>Ticket status<select id="verified-status"><option ${t.status === "Awaiting review" ? "selected" : ""}>Awaiting review</option><option ${t.status === "Accepted" ? "selected" : ""}>Accepted</option><option ${t.status === "Completed" ? "selected" : ""}>Completed</option><option ${t.status === "Rejected" ? "selected" : ""}>Rejected</option></select></label>
           <button id="save-review" class="button button-primary" type="button">Save review</button>
         </div>
@@ -439,6 +442,7 @@ function initCustomer() {
       document.getElementById("save-review").addEventListener("click", () => {
         const weight = Number(document.getElementById("verified-weight").value);
         const status = document.getElementById("verified-status").value;
+        const quality = (document.getElementById("quality_rating").value) / 100;
         if (!(weight > 0) && status !== "Rejected") {
           showMessage("review-message", "Enter a verified weight greater than zero.", true);
           return;
@@ -448,7 +452,7 @@ function initCustomer() {
         if (index < 0) return;
         records[index].actualWeight = weight > 0 ? weight : null;
         records[index].status = status;
-        records[index].finalAmount = (status === "Accepted" || status === "Completed") ? calculatePayout(records[index].rate, weight, t.method) : null;
+        records[index].finalAmount = (status === "Accepted" || status === "Completed") ? calculatePayout(records[index].rate, weight, t.method, quality) : null;
         writeList(STORAGE_KEY, records);
         selectedId = t.id;
         refresh();
