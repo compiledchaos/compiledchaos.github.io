@@ -79,8 +79,9 @@
               <label class="choice-card"><input id="drop_off" type="radio" name="method" value="Drop-off" checked><span class="choice-icon">⌂</span><span><b>I'll drop it off</b><small>Bring it to a collection point</small></span></label>
               <label class="choice-card"><input id="pickup" type="radio" name="method" value="Pickup"><span class="choice-icon">↗</span><span><b>Pick it up</b><small>We collect it from you</small></span></label>
             </div>
-            <label id="location-label">Drop-off
-              <select name="location" id="locations-select">
+            <label id="location-label" style="display:block;">
+              <span class="label-text">Drop-off location</span>
+              <select name="location" id="dropoff-location">
                 <option value="Place1">Place1</option>
                 <option value="Place2">Place2</option>
                 <option value="Place3">Place3</option>
@@ -88,8 +89,10 @@
                 <option value="Place5">Place5</option>
               </select>
             </label>
-            <label id="address-label">Pickup location
-              <input type="text" placeholder="Enter Pickup Location">
+
+            <label id="address-label" style="display:none;">
+              <span class="label-text">Pickup location</span>
+              <input id="pickup-location" type="text" name="" placeholder="Enter Pickup Location" disabled>
             </label>
           </fieldset>
 

@@ -25,7 +25,7 @@
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   })[ch]);
   const makeId = () => "OWW-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-
+/*
   function initCustomer() {
     const form = document.getElementById("waste-form");
     if (!form) return;
@@ -41,10 +41,19 @@
     const locationInput = document.getElementById("location-input");
 
     function updateEstimate() {
+      const data = new FormData(form);
       const rate = rates[category.value];
       const qty = Number(weight.value);
+      const method = String(data.get("method") || "Drop-off");
+      var x;
+      if (method == "Pickup") {
+          x = (rate * qty) * 0.80;
+      }
+      else {
+        x = 0;
+      }
       rateDisplay.textContent = rate ? `${money(rate)} / kg` : "Choose a category";
-      estimateDisplay.textContent = rate && qty > 0 ? money(rate * qty) : "₹—";
+      estimateDisplay.textContent = rate && qty > 0 ? money((rate * qty) - x) : "₹—";
     }
     category.addEventListener("change", updateEstimate);
     weight.addEventListener("input", updateEstimate);
@@ -156,6 +165,175 @@
       document.getElementById('address-label').style.display='none'
     });
   }
+*/
+function calculatePayout(rate, qty, method) {
+  return rate * qty * (method === "Pickup" ? 0.8 : 1);
+}
+
+function initCustomer() {
+  const form = document.getElementById("waste-form");
+  if (!form) return;
+
+  const category = document.getElementById("waste-category");
+  const weight = form.elements.weight;
+  const rateDisplay = document.getElementById("rate-display");
+  const estimateDisplay = document.getElementById("estimate-display");
+  const photoInput = document.getElementById("waste-photo");
+  const preview = document.getElementById("photo-preview");
+  const methodInputs = [...form.querySelectorAll('input[name="method"]')];
+  const locationLabel = document.getElementById("location-label");
+  const addressLabel = document.getElementById("address-label");
+  const dropoffLocation = document.getElementById("dropoff-location");
+  const pickupLocation = document.getElementById("pickup-location");
+
+  function syncLocationFields() {
+    const isPickup = form.elements.method.value === "Pickup";
+    if (!locationLabel || !addressLabel || !dropoffLocation || !pickupLocation) return;
+
+    locationLabel.style.display = isPickup ? "none" : "block";
+    addressLabel.style.display = isPickup ? "block" : "none";
+
+    dropoffLocation.disabled = isPickup;
+    dropoffLocation.style.display = isPickup ? "none" : "block";
+    dropoffLocation.name = isPickup ? "" : "location";
+    dropoffLocation.required = !isPickup;
+
+    pickupLocation.disabled = !isPickup;
+    pickupLocation.style.display = isPickup ? "block" : "none";
+    pickupLocation.name = isPickup ? "location" : "";
+    pickupLocation.required = isPickup;
+  }
+
+
+  function updateEstimate() {
+  const rate = rates[category.value];
+  const qty = Number(weight.value);
+  const selectedMethod = form.querySelector('input[name="method"]:checked');
+  const method = selectedMethod?.value || "Drop-off";
+
+  rateDisplay.textContent = rate ? `${money(rate)} / kg` : "Choose a category";
+  estimateDisplay.textContent =
+    rate && qty > 0 ? money(calculatePayout(rate, qty, method)) : "₹—";
+}
+
+  category.addEventListener("change", updateEstimate);
+  weight.addEventListener("input", updateEstimate);
+
+  methodInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    syncLocationFields();
+    updateEstimate();
+  });
+});
+
+  if (photoInput) {
+    photoInput.addEventListener("change", () => {
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) {
+        preview.classList.add("hidden");
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        photoInput.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        preview.src = reader.result;
+        preview.classList.remove("hidden");
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
+    const wasteCategory = String(data.get("category") || "");
+    const qty = Number(data.get("weight"));
+    const method = String(data.get("method") || "Drop-off");
+    const location = String(data.get("location") || "").trim();
+    const details = String(data.get("details") || "").trim();
+    const file = photoInput && photoInput.files ? photoInput.files[0] : null;
+
+    if (!name || !phone || !rates[wasteCategory] || !(qty > 0) || !location) {
+      showMessage("submit-message", "Please complete all required fields.", true);
+      return;
+    }
+
+    if (!/^[0-9+\-\s]{10,16}$/.test(phone)) {
+      showMessage("submit-message", "Please enter a valid phone number.", true);
+      return;
+    }
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = "Creating ticket…";
+
+    try {
+      let photoData = "";
+      if (file) photoData = await compressImage(file);
+
+      const rate = rates[wasteCategory];
+      const ticket = {
+        id: makeId(),
+        name,
+        phone,
+        category: wasteCategory,
+        classification: wasteCategory,
+        classificationNote: "Category-assisted prototype classification; not a trained AI result.",
+        weight: qty,
+        rate,
+        estimatedAmount: calculatePayout(rate, qty, method),
+        method,
+        location,
+        details,
+        photo: photoData,
+        status: "Awaiting review",
+        actualWeight: null,
+        finalAmount: null,
+        createdAt: new Date().toISOString()
+      };
+
+      const records = readList(STORAGE_KEY);
+      records.unshift(ticket);
+      writeList(STORAGE_KEY, records);
+
+      showMessage("submit-message", `Submission saved. Your ticket ID is ${ticket.id}. Keep this ID to look up your submission.`);
+      document.getElementById("lookup-id").value = ticket.id;
+      renderTicket(ticket);
+
+      form.reset();
+      preview.src = "";
+      preview.classList.add("hidden");
+      syncLocationFields();
+      updateEstimate();
+    } catch (error) {
+      showMessage("submit-message", "Could not save this submission in browser storage. Try a smaller photo.", true);
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = 'Submit waste &amp; generate ticket <span>→</span>';
+    }
+  });
+
+  document.getElementById("lookup-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const id = document.getElementById("lookup-id").value.trim().toUpperCase();
+    const ticket = readList(STORAGE_KEY).find(item => item.id.toUpperCase() === id);
+    if (!ticket) {
+      document.getElementById("ticket-result").innerHTML = '<p class="form-message error">No ticket found. Check the ID and try again.</p>';
+      return;
+    }
+    renderTicket(ticket);
+  });
+
+  syncLocationFields();
+  updateEstimate();
+}
 
   function compressImage(file) {
     return new Promise((resolve, reject) => {
@@ -270,7 +448,7 @@
         if (index < 0) return;
         records[index].actualWeight = weight > 0 ? weight : null;
         records[index].status = status;
-        records[index].finalAmount = (status === "Accepted" || status === "Completed") ? weight * records[index].rate : null;
+        records[index].finalAmount = (status === "Accepted" || status === "Completed") ? calculatePayout(records[index].rate, weight, t.method) : null;
         writeList(STORAGE_KEY, records);
         selectedId = t.id;
         refresh();
