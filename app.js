@@ -473,7 +473,38 @@ function initCustomer() {
   }
 
   function initFarmer() {
+    const form = document.getElementById("cart-form");
+    if (!form) return;
     const grid = document.getElementById("product-grid");
+    const methodInputs = [...form.querySelectorAll('input[name="method"]')];
+    const locationLabel = document.getElementById("location-label");
+    const addressLabel = document.getElementById("address-label");
+    const dropoffLocation = document.getElementById("dropoff-location");
+    const pickupLocation = document.getElementById("pickup-location");
+
+    function syncLocationFields() {
+      const isPickup = form.elements.method.value === "Pickup";
+      if (!locationLabel || !addressLabel || !dropoffLocation || !pickupLocation) return;
+
+      locationLabel.style.display = isPickup ? "none" : "block";
+      addressLabel.style.display = isPickup ? "block" : "none";
+
+      dropoffLocation.disabled = isPickup;
+      dropoffLocation.style.display = isPickup ? "none" : "block";
+      dropoffLocation.name = isPickup ? "" : "location";
+      dropoffLocation.required = !isPickup;
+
+      pickupLocation.disabled = !isPickup;
+      pickupLocation.style.display = isPickup ? "block" : "none";
+      pickupLocation.name = isPickup ? "location" : "";
+      pickupLocation.required = isPickup;
+    }
+    methodInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        syncLocationFields();
+      });
+    });
+
     if (!grid) return;
     const products = {
       compost: { name: "Organic compost", unit: "kg", price: 12 },
@@ -508,24 +539,43 @@ function initCustomer() {
       delete cart[button.dataset.remove];
       renderCart();
     });
+    
     document.getElementById("place-order").addEventListener("click", () => {
-      const entries = Object.entries(cart).filter(([, qty]) => qty > 0);
-      if (!entries.length) return;
-      const order = {
-        id: "ORD-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
-        items: entries.map(([key, qty]) => ({ name: products[key].name, quantity: qty, unit: products[key].unit, price: products[key].price })),
-        total: entries.reduce((sum, [key, qty]) => sum + products[key].price * qty, 0),
-        createdAt: new Date().toISOString(),
-        demo: true
-      };
-      const orders = readList(ORDER_KEY);
-      orders.unshift(order);
-      writeList(ORDER_KEY, orders);
-      Object.keys(cart).forEach(key => delete cart[key]);
-      renderCart();
-      showMessage("order-message", `Demonstration order ${order.id} created. No payment has been taken.`);
-    });
-    renderCart();
+  const entries = Object.entries(cart).filter(([, qty]) => qty > 0);
+  if (!entries.length) return;
+
+  const purchase = {
+    id: "ORD-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
+    farmerName: form.elements.name.value,
+    phone: form.elements.phone.value,
+    items: entries.map(([key, qty]) => ({
+      name: products[key].name,
+      quantity: qty,
+      unit: products[key].unit,
+      price: products[key].price
+    })),
+    totalAmount: entries.reduce(
+      (sum, [key, qty]) => sum + products[key].price * qty,
+      0
+    ),
+    notes: form.elements.details.value,
+    createdAt: new Date().toISOString()
+  };
+
+  const orders = readList(ORDER_KEY);
+  orders.unshift({
+    id: purchase.id,
+    items: purchase.items,
+    total: purchase.totalAmount,
+    createdAt: purchase.createdAt,
+    demo: true
+  });
+  writeList(ORDER_KEY, orders);
+
+  Object.keys(cart).forEach(key => delete cart[key]);
+  renderCart();
+  showMessage("order-message", `Demonstration order ${purchase.id} created. No payment has been taken.`);
+});
   }
 
   const page = document.body.dataset.page;

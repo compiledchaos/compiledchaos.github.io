@@ -28,7 +28,41 @@
     </section>
     <section class="content-grid farmer-lower">
       <div class="panel">
-        <p class="eyebrow">DEMO CHECKOUT</p><h2>Your cart</h2>
+        <p class="eyebrow">DEMO CHECKOUT</p>
+        <div class="section-heading">
+          <div><p class="eyebrow">NEW SUBMISSION</p><h2>Submit organic waste</h2></div>
+          <span class="pill pill-green">Free to submit</span>
+        </div>
+        <form id="cart-form">
+          <div class="form-row">
+            <label>Full name<input name="name" type="text" placeholder="e.g. Arun Kumar" maxlength="70" required></label>
+            <label>Mobile number<input name="phone" type="tel" inputmode="numeric" placeholder="10-digit mobile number" pattern="[0-9+\-\s]{10,16}" required></label>
+          </div>
+          <label>Additional details<textarea name="details" rows="3" maxlength="500" placeholder="Describe the waste, its condition, or anything we should know."></textarea></label>
+          <fieldset class="pickup-fieldset">
+            <legend>How should we receive your waste?</legend>
+            <div class="choice-grid">
+              <label class="choice-card"><input id="drop_off" type="radio" name="method" value="Drop-off" checked><span class="choice-icon">⌂</span><span><b>I'll drop it off</b><small>Bring it to a collection point</small></span></label>
+              <label class="choice-card"><input id="pickup" type="radio" name="method" value="Pickup"><span class="choice-icon">↗</span><span><b>Pick it up</b><small>We collect it from you</small></span></label>
+            </div>
+            <label id="location-label" style="display:block;">
+              <span class="label-text">Drop-off location</span>
+              <select name="location" id="dropoff-location">
+                <option value="Place1">Place1</option>
+                <option value="Place2">Place2</option>
+                <option value="Place3">Place3</option>
+                <option value="Place4">Place4</option>
+                <option value="Place5">Place5</option>
+              </select>
+            </label>
+
+            <label id="address-label" style="display:none;">
+              <span class="label-text">Pickup location</span>
+              <input id="pickup-location" type="text" name="" placeholder="Enter Pickup Location" disabled>
+            </label>
+          </fieldset>
+        </form>
+        <h2>Your cart</h2>
         <div id="cart-items" class="cart-items"><p class="muted">Your cart is empty. Add a product to begin.</p></div>
         <div class="cart-total"><span>Demo total</span><strong id="cart-total">₹0</strong></div>
         <button id="place-order" class="button button-primary button-wide" type="button" disabled>Place demonstration order</button>
