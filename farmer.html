@@ -30,23 +30,23 @@
       <div class="panel">
         <p class="eyebrow">DEMO CHECKOUT</p>
         <div class="section-heading">
-          <div><p class="eyebrow">NEW SUBMISSION</p><h2>Submit organic waste</h2></div>
-          <span class="pill pill-green">Free to submit</span>
+          <div><p class="eyebrow">NEW ORDER</p><h2>Place a product order</h2></div>
+          <span class="pill pill-green">Demo pricing</span>
         </div>
         <form id="cart-form">
           <div class="form-row">
             <label>Full name<input name="name" type="text" placeholder="e.g. Arun Kumar" maxlength="70" required></label>
             <label>Mobile number<input name="phone" type="tel" inputmode="numeric" placeholder="10-digit mobile number" pattern="[0-9+\-\s]{10,16}" required></label>
           </div>
-          <label>Additional details<textarea name="details" rows="3" maxlength="500" placeholder="Describe the waste, its condition, or anything we should know."></textarea></label>
+          <label>Delivery instructions<textarea name="details" rows="3" maxlength="500" placeholder="Add delivery instructions or any details we should know."></textarea></label>
           <fieldset class="pickup-fieldset">
-            <legend>How should we receive your waste?</legend>
+            <legend>How should you receive your order?</legend>
             <div class="choice-grid">
-              <label class="choice-card"><input id="drop_off" type="radio" name="method" value="Drop-off" checked><span class="choice-icon">⌂</span><span><b>I'll drop it off</b><small>Bring it to a collection point</small></span></label>
-              <label class="choice-card"><input id="pickup" type="radio" name="method" value="Pickup"><span class="choice-icon">↗</span><span><b>Pick it up</b><small>We collect it from you</small></span></label>
+              <label class="choice-card"><input id="drop_off" type="radio" name="method" value="Drop-off" checked><span class="choice-icon">⌂</span><span><b>Collect from a point</b><small>Pickup is free</small></span></label>
+              <label class="choice-card"><input id="pickup" type="radio" name="method" value="Pickup"><span class="choice-icon">↗</span><span><b>Home delivery</b><small>₹50 delivery fee</small></span></label>
             </div>
             <label id="location-label" style="display:block;">
-              <span class="label-text">Drop-off location</span>
+              <span class="label-text">Collection point</span>
               <select name="location" id="dropoff-location">
                 <option value="Place1">Place1</option>
                 <option value="Place2">Place2</option>
@@ -57,15 +57,19 @@
             </label>
 
             <label id="address-label" style="display:none;">
-              <span class="label-text">Pickup location</span>
-              <input id="pickup-location" type="text" name="" placeholder="Enter Pickup Location" disabled>
+              <span class="label-text">Delivery address</span>
+              <input id="pickup-location" type="text" name="" placeholder="Enter your delivery address" disabled>
             </label>
           </fieldset>
         </form>
         <h2>Your cart</h2>
         <div id="cart-items" class="cart-items"><p class="muted">Your cart is empty. Add a product to begin.</p></div>
-        <div class="cart-total"><span>Demo total</span><strong id="cart-total">₹0</strong></div>
-        <button id="place-order" class="button button-primary button-wide" type="button" disabled>Place demonstration order</button>
+        <div class="cart-breakdown">
+          <div><span>Subtotal</span><strong id="cart-subtotal">₹0</strong></div>
+          <div><span>Delivery fee</span><strong id="delivery-fee">₹0</strong></div>
+        </div>
+        <div class="cart-total"><span>Order total</span><strong id="cart-total">₹0</strong></div>
+        <button id="place-order" class="button button-primary button-wide" type="button" disabled>Place order</button>
         <div id="order-message" class="form-message" role="status"></div>
       </div>
       <div class="info-card"><span class="info-symbol">i</span><div><b>About these listings</b><p>Prices and availability are fictional demonstration values. The pesticide is a research concept only; commercial sale or use would require testing, registration and regulatory approval. No real orders or payments are processed.</p></div></div>
@@ -73,11 +77,11 @@
       <aside class="side-column">
         <div class="panel lookup-panel">
           <p class="eyebrow">TICKET LOOKUP</p>
-          <h2>Track a submission</h2>
-          <p class="muted">Already submitted waste? Enter the ticket ID you received to view its details and estimated payment.</p>
+          <h2>Track an order</h2>
+          <p class="muted">Already placed an order? Enter the order ID to view your items and final total.</p>
           <form id="lookup-ORD-form" class="lookup-form">
             <label for="lookup-ORD-id">Your ticket ID</label>
-            <div class="lookup-input-row"><input id="lookup-ORD-id" type="text" placeholder="e.g. OWW-ABC123" required><button class="button button-dark" type="submit">Find</button></div>
+            <div class="lookup-input-row"><input id="lookup-ORD-id" type="text" placeholder="e.g. ORD-ABC12" required><button class="button button-dark" type="submit">Find order</button></div>
           </form>
           <div id="ticket-ORD-result" class="ticket-result" aria-live="polite"></div>
         </div>

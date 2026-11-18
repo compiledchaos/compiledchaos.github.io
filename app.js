@@ -6,6 +6,7 @@
 
   const STORAGE_KEY = "oww_submissions_v1";
   const ORDER_KEY = "oww_orders_v1";
+  const DELIVERY_FEE = 50;
   const rates = {
     "Vegetable waste": 3,
     "Fruit waste": 2,
@@ -390,8 +391,39 @@ function initCustomer() {
 
   function initAdmin() {
     const tbody = document.getElementById("admin-ticket-list");
-    if (!tbody) return;
+    const orderTbody = document.getElementById("admin-order-list");
+    if (!tbody || !orderTbody) return;
     let selectedId = null;
+
+    function refreshOrders() {
+      const orders = readList(ORDER_KEY);
+      const query = (document.getElementById("order-search").value || "").toLowerCase();
+      const filtered = orders.filter(order => [
+        order.id,
+        order.farmerName,
+        order.phone,
+        order.location,
+        ...(order.items || []).map(item => item.name)
+      ].some(value => String(value).toLowerCase().includes(query)));
+
+      orderTbody.innerHTML = filtered.length ? filtered.map(order => {
+        const itemSummary = (order.items || []).map(item =>
+          `${item.quantity} ${escapeHTML(item.unit)} × ${escapeHTML(item.name)}`
+        ).join("<br>");
+        const deliveryFee = order.deliveryFee ?? (order.method === "Pickup" ? DELIVERY_FEE : 0);
+        const subtotal = order.subtotal ?? Math.max(0, Number(order.totalAmount || 0) - deliveryFee);
+        const fulfillment = order.method === "Pickup" ? "Home delivery" : "Collection point";
+        return `
+          <tr>
+            <td><b>${escapeHTML(order.id)}</b><small>${escapeHTML(order.farmerName)} · ${escapeHTML(order.phone)}</small></td>
+            <td><b>${itemSummary || "No items"}</b></td>
+            <td>${escapeHTML(fulfillment)}<small>${escapeHTML(order.location)}</small></td>
+            <td><b>${money(subtotal)}</b><small>Fee: ${money(deliveryFee)}</small></td>
+            <td><b>${money(order.totalAmount)}</b></td>
+            <td><span class="status accepted">${escapeHTML(order.status || "Demonstration order")}</span></td>
+          </tr>`;
+      }).join("") : '<tr><td colspan="6" class="empty-state">No matching farmer orders found.</td></tr>';
+    }
 
     function refresh() {
       const records = readList(STORAGE_KEY);
@@ -411,6 +443,7 @@ function initCustomer() {
           <td><span class="status ${t.status === "Accepted" ? "accepted" : t.status === "Completed" ? "completed" : ""}">${escapeHTML(t.status)}</span></td>
           <td><button class="button button-outline" data-open="${escapeHTML(t.id)}">Review</button></td>
         </tr>`).join("") : '<tr><td colspan="6" class="empty-state">No matching tickets found.</td></tr>';
+      refreshOrders();
       if (selectedId && records.some(t => t.id === selectedId)) renderAdminDetail(records.find(t => t.id === selectedId));
     }
 
@@ -469,6 +502,8 @@ function initCustomer() {
     });
     document.getElementById("admin-search").addEventListener("input", refresh);
     document.getElementById("refresh-tickets").addEventListener("click", refresh);
+    document.getElementById("order-search").addEventListener("input", refreshOrders);
+    document.getElementById("refresh-orders").addEventListener("click", refreshOrders);
     refresh();
   }
 
@@ -502,6 +537,7 @@ function initCustomer() {
     methodInputs.forEach((input) => {
       input.addEventListener("change", () => {
         syncLocationFields();
+        renderCart();
       });
     });
 
@@ -517,8 +553,12 @@ function initCustomer() {
     function renderCart() {
       const entries = Object.entries(cart).filter(([, qty]) => qty > 0);
       const count = entries.reduce((sum, [, qty]) => sum + qty, 0);
-      const total = entries.reduce((sum, [key, qty]) => sum + products[key].price * qty, 0);
+      const subtotal = entries.reduce((sum, [key, qty]) => sum + products[key].price * qty, 0);
+      const deliveryFee = form.elements.method.value === "Pickup" ? DELIVERY_FEE : 0;
+      const total = subtotal + deliveryFee;
       document.getElementById("cart-count").textContent = count;
+      document.getElementById("cart-subtotal").textContent = money(subtotal);
+      document.getElementById("delivery-fee").textContent = money(deliveryFee);
       document.getElementById("cart-total").textContent = money(total);
       document.getElementById("place-order").disabled = count === 0;
       cartItems.innerHTML = entries.length ? entries.map(([key, qty]) => `
@@ -541,41 +581,104 @@ function initCustomer() {
     });
     
     document.getElementById("place-order").addEventListener("click", () => {
-  const entries = Object.entries(cart).filter(([, qty]) => qty > 0);
-  if (!entries.length) return;
+      const entries = Object.entries(cart).filter(([, qty]) => qty > 0);
+      if (!entries.length) {
+        showMessage("order-message", "Add a product to your cart before placing an order.", true);
+        return;
+      }
+      if (!form.reportValidity()) return;
 
-  const purchase = {
-    id: "ORD-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
-    farmerName: form.elements.name.value,
-    phone: form.elements.phone.value,
-    items: entries.map(([key, qty]) => ({
-      name: products[key].name,
-      quantity: qty,
-      unit: products[key].unit,
-      price: products[key].price
-    })),
-    totalAmount: entries.reduce(
-      (sum, [key, qty]) => sum + products[key].price * qty,
-      0
-    ),
-    notes: form.elements.details.value,
-    createdAt: new Date().toISOString()
-  };
+      const name = form.elements.name.value.trim();
+      const phone = form.elements.phone.value.trim();
+      if (!name || !/^[0-9+\-\s]{10,16}$/.test(phone)) {
+        showMessage("order-message", "Please enter a name and a valid 10-digit mobile number.", true);
+        return;
+      }
 
-  const orders = readList(ORDER_KEY);
-  orders.unshift({
-    id: purchase.id,
-    items: purchase.items,
-    total: purchase.totalAmount,
-    createdAt: purchase.createdAt,
-    demo: true
-  });
-  writeList(ORDER_KEY, orders);
+      const method = form.elements.method.value || "Drop-off";
+      const location = String(form.elements.location?.value || "").trim();
+      if (!location) {
+        showMessage("order-message", "Please enter or choose a delivery or collection location.", true);
+        return;
+      }
+      const subtotal = entries.reduce((sum, [key, qty]) => sum + products[key].price * qty, 0);
+      const deliveryFee = method === "Pickup" ? DELIVERY_FEE : 0;
 
-  Object.keys(cart).forEach(key => delete cart[key]);
-  renderCart();
-  showMessage("order-message", `Demonstration order ${purchase.id} created. No payment has been taken.`);
-});
+      const purchase = {
+        id: "ORD-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
+        farmerName: name,
+        phone,
+        items: entries.map(([key, qty]) => ({
+          name: products[key].name,
+          quantity: qty,
+          unit: products[key].unit,
+          price: products[key].price
+        })),
+        subtotal,
+        deliveryFee,
+        totalAmount: subtotal + deliveryFee,
+        notes: form.elements.details.value.trim(),
+        method,
+        location,
+        status: "Demonstration order",
+        createdAt: new Date().toISOString(),
+        demo: true
+      };
+
+      try {
+        const orders = readList(ORDER_KEY);
+        orders.unshift(purchase);
+        writeList(ORDER_KEY, orders);
+
+        Object.keys(cart).forEach(key => delete cart[key]);
+        renderCart();
+        form.reset();
+        syncLocationFields();
+        renderCart();
+        document.getElementById("lookup-ORD-id").value = purchase.id;
+        showMessage("order-message", `Demonstration order ${purchase.id} created. No payment has been taken.`);
+        renderFarmerOrder(purchase);
+      } catch (error) {
+        showMessage("order-message", "Could not save this demonstration order in browser storage.", true);
+      }
+    });
+
+    function renderFarmerOrder(order) {
+      const result = document.getElementById("ticket-ORD-result");
+      if (!result) return;
+      result.innerHTML = `
+        <div class="ticket-card">
+          <div class="ticket-id">${escapeHTML(order.id)}</div>
+          <h3>${escapeHTML(order.farmerName)}</h3>
+          <span class="status accepted">${escapeHTML(order.status)}</span>
+          <div class="ticket-meta">
+            <div><span>Mobile</span><b>${escapeHTML(order.phone)}</b></div>
+            <div><span>Subtotal</span><b>${money(order.subtotal ?? order.totalAmount)}</b></div>
+            <div><span>Delivery fee</span><b>${money(order.deliveryFee ?? 0)}</b></div>
+            <div><span>Total</span><b>${money(order.totalAmount)}</b></div>
+            <div><span>Fulfillment</span><b>${order.method === "Pickup" ? "Home delivery" : "Collection point"}</b></div>
+            <div><span>Location</span><b>${escapeHTML(order.location)}</b></div>
+            <div><span>Items</span><b>${escapeHTML(order.items.map(item => `${item.quantity} ${item.unit} ${item.name}`).join(", "))}</b></div>
+            <div><span>Details</span><b>${escapeHTML(order.notes || "No additional details")}</b></div>
+          </div>
+          <p class="fine-print">This is a local demonstration record. No real order or payment was processed.</p>
+        </div>`;
+    }
+
+    document.getElementById("lookup-ORD-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const id = document.getElementById("lookup-ORD-id").value.trim().toUpperCase();
+      const order = readList(ORDER_KEY).find(item => item.id.toUpperCase() === id);
+      if (!order) {
+        document.getElementById("ticket-ORD-result").innerHTML =
+          '<p class="form-message error">No demonstration order found. Check the ticket ID and try again.</p>';
+        return;
+      }
+      renderFarmerOrder(order);
+    });
+
+    syncLocationFields();
+    renderCart();
   }
 
   const page = document.body.dataset.page;

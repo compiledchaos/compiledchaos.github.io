@@ -39,11 +39,23 @@
       </div>
       <p class="fine-print">This is a demonstration admin panel. Records are stored in this browser's local storage and are not shared across devices.</p>
     </section>
+    <section class="panel admin-panel">
+      <div class="section-heading responsive-heading">
+        <div><p class="eyebrow">FARMER MARKETPLACE</p><h2>Demonstration orders</h2></div>
+        <div class="table-actions"><input id="order-search" type="search" placeholder="Search order or customer"><button id="refresh-orders" class="button button-outline" type="button">↻ Refresh</button></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Order / Customer</th><th>Items</th><th>Fulfillment</th><th>Subtotal / Fee</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="admin-order-list"><tr><td colspan="6" class="empty-state">No farmer orders yet. Place one from the Farmer page.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
     <section class="panel detail-panel">
       <div class="section-heading"><div><p class="eyebrow">TICKET REVIEW</p><h2>Inspect selected ticket</h2></div><span class="pill">Admin review</span></div>
       <div id="admin-ticket-detail" class="empty-state">Select a ticket from the table to review its details.</div>
     </section>
-    <button title="Clear testing data" onclick="localStorage.clear(); location.reload()">Clear Data</button>
+    <button class="button button-outline" title="Clear testing data" onclick="localStorage.clear(); location.reload()">Reset demo data</button>
     <footer class="footer"><span>© 2026 GreenGuardians</span><span>Admin · Prototype</span></footer>
   </main>
 </body>
