@@ -8,12 +8,12 @@
   const ORDER_KEY = "oww_orders_v1";
   const DELIVERY_FEE = 50;
   const rates = {
-    "Vegetable waste": 3,
-    "Fruit waste": 2,
-    "Onion waste": 4,
-    "Garlic waste": 5,
-    "Mixed organic waste": 1,
-    "Other plant-based waste": 2
+    "Vegetable waste": 12,
+    "Fruit waste": 12,
+    "Onion waste": 15,
+    "Garlic waste": 15,
+    "Mixed organic waste": 5,
+    "Other plant-based waste": 5
   };
 
   const readList = (key) => {
@@ -543,7 +543,7 @@ function initCustomer() {
 
     if (!grid) return;
     const products = {
-      compost: { name: "Organic compost", unit: "kg", price: 12 },
+      compost: { name: "Organic compost", unit: "kg", price: 15 },
       pesticide: { name: "Allium-based botanical pesticide (R&D concept)", unit: "L", price: 150 },
       biogas: { name: "Biogas", unit: "m³", price: 25 }
     };
