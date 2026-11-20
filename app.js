@@ -543,9 +543,9 @@ function initCustomer() {
 
     if (!grid) return;
     const products = {
-      compost: { name: "Organic compost", unit: "kg", price: 15 },
+      compost: { name: "Organic compost", unit: "kg", price: 25 },
       pesticide: { name: "Allium-based botanical pesticide (R&D concept)", unit: "L", price: 150 },
-      biogas: { name: "Biogas", unit: "m³", price: 25 }
+      biogas: { name: "Biogas", unit: "m³", price: 35 }
     };
     const cart = {};
     const cartItems = document.getElementById("cart-items");
